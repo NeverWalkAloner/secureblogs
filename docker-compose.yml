@@ -1,0 +1,27 @@
+services:
+  db:
+    image: postgres:15.1
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_DB: appdb
+      POSTGRES_PASSWORD: root
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    volumes:
+      - ".postgres-data:/var/lib/postgresql/data:delegated"
+  web:
+    build: .
+    environment:
+      - POSTGRES_DATABASE_URL=postgresql+asyncpg://root:root@db/postgres
+      - SQLALCHEMY_DATABASE_URL=postgresql+asyncpg://root:root@db/appdb
+      - TEST_SQLALCHEMY_DATABASE_URL=postgresql+asyncpg://root:root@db/testdb
+      - TEST_DB_NAME=testdb
+      - WAIT_HOSTS=db:5432
+    volumes:
+      - .:/fastapiwebsockets
+    ports:
+      - "8000:8000"
+    restart: always
+    depends_on:
+      - db
