@@ -8,7 +8,7 @@ ENV POETRY_VERSION="1.3.1"
 RUN curl -sSL https://install.python-poetry.org | python3 -
 ENV PATH="${POETRY_HOME}/venv/bin:${PATH}"
 # Install system dependencies
-COPY poetry.* pyproject.toml /fastapiwebsockets
+COPY poetry.* pyproject.toml /fastapiwebsockets/
 RUN poetry install
 # Copy code and run web server
 COPY . /fastapiwebsockets
