@@ -1,7 +1,9 @@
+from datetime import datetime, timedelta
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.users import User
+from app.models.users import User, UserToken
 from app.schemas.user import UserCreate
 
 
@@ -21,3 +23,12 @@ async def create_user(db: AsyncSession, user: UserCreate) -> User:
     await db.commit()
     await db.refresh(db_user)
     return db_user
+
+
+async def create_user_token(db: AsyncSession, user: User) -> UserToken:
+    db_token = UserToken(
+        user=user, expires=datetime.now() + timedelta(weeks=2)
+    )
+    db.add(db_token)
+    await db.commit()
+    return db_token

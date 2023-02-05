@@ -1,5 +1,10 @@
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
-from sqlalchemy.orm import relationship
+import uuid
+from datetime import datetime
+
+from sqlalchemy import (Boolean, Column, DateTime, ForeignKey, Integer, String,
+                        select)
+from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import object_session, relationship
 from sqlalchemy_utils import EmailType, PasswordType, force_auto_coercion
 
 from app.db.base_class import Base
@@ -16,6 +21,7 @@ class User(Base):
     password = Column(PasswordType(schemes=["pbkdf2_sha512"]), nullable=False)
 
     keys = relationship("UserKeys", back_populates="user", lazy='dynamic')
+    tokens = relationship("UserToken", back_populates="user", lazy='dynamic')
 
 
 class UserKeys(Base):
@@ -27,3 +33,16 @@ class UserKeys(Base):
     is_revoked = Column(Boolean, default=False)
 
     user = relationship("User", back_populates="keys")
+
+
+class UserToken(Base):
+    __tablename__ = "user_tokens"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    token = Column(
+        UUID(as_uuid=True), unique=True, nullable=False, default=uuid.uuid4
+    )
+    expires = Column(DateTime)
+
+    user = relationship("User", back_populates="tokens")
