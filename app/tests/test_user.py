@@ -1,16 +1,19 @@
 import pytest
+from sqlalchemy import func, select
+
 from app.models.users import UserToken
-from sqlalchemy import select
 
 
 @pytest.mark.asyncio
-async def test_sign_up(async_client):
+async def test_sign_up(async_client, db_session):
     request_data = {
         "email": "hello@world.com",
         "name": "Alex",
         "password": "12345678",
     }
     response = await async_client.post("/sign-up/", json=request_data)
+    token_counts = await db_session.execute(select(func.count(UserToken.id)))
+    assert token_counts.scalar_one() == 1
     assert response.status_code == 200
     assert response.json()["id"] is not None
     assert response.json()["email"] == "hello@world.com"
