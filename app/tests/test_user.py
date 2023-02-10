@@ -52,3 +52,56 @@ async def test_sign_up_weak_password(async_client):
         response.json()["detail"][0]["type"]
         == "value_error.any_str.min_length"
     )
+
+
+@pytest.mark.asyncio
+async def test_login_success(async_client, user):
+    request_data = {
+        "email": user.email,
+        "password": "12345678",
+    }
+    response = await async_client.post("/login/", json=request_data)
+    assert response.status_code == 200
+    assert response.json()["email"] == user.email
+    assert response.json()["name"] == user.name
+    assert response.json()["token"]["access_token"] is not None
+    assert response.json()["token"]["expires"] is not None
+    assert response.json()["token"]["token_type"] == "bearer"
+
+
+@pytest.mark.asyncio
+async def test_login_invalid_email(async_client, user):
+    request_data = {
+        "email": "invalid@mail.com",
+        "password": "12345678",
+    }
+    response = await async_client.post("/login/", json=request_data)
+    assert response.status_code == 400
+    assert response.json()["detail"] == "User not found"
+
+
+@pytest.mark.asyncio
+async def test_login_invalid_password(async_client, user):
+    request_data = {
+        "email": user.email,
+        "password": "password123",
+    }
+    response = await async_client.post("/login/", json=request_data)
+    assert response.status_code == 400
+    assert response.json()["detail"] == "User not found"
+
+
+@pytest.mark.asyncio
+async def test_user_details_success(async_client, user, token):
+    response = await async_client.get(
+        "/users/me/", headers={"Authorization": f"Bearer {token.token}"}
+    )
+    assert response.status_code == 200
+    assert response.json()["email"] == user.email
+    assert response.json()["name"] == user.name
+
+
+@pytest.mark.asyncio
+async def test_user_details_unauthorized(async_client, user):
+    response = await async_client.get("/users/me/")
+    assert response.status_code == 401

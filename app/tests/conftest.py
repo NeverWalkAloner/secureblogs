@@ -9,8 +9,8 @@ from sqlalchemy.orm import sessionmaker
 
 from app.api.deps import get_db
 from app.core.config import settings
-from app.crud.crud_user import create_user
-from app.db.base import Base, User
+from app.crud.crud_user import create_user, create_user_token
+from app.db.base import Base, User, UserToken
 from app.main import app
 from app.schemas.user import UserCreate
 
@@ -83,4 +83,13 @@ async def async_client(override_get_db):
 @pytest_asyncio.fixture
 async def user(db_session: AsyncSession) -> User:
     user = UserCreate(email="test@test.com", name="Hello", password="12345678")
-    return await create_user(db_session, user)
+    user_db = await create_user(db_session, user)
+    yield user_db
+    await db_session.delete(user_db)
+    await db_session.commit()
+
+
+@pytest_asyncio.fixture
+async def token(db_session: AsyncSession, user: User) -> UserToken:
+    token_db = await create_user_token(db_session, user)
+    return token_db

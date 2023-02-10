@@ -1,10 +1,8 @@
 import uuid
-from datetime import datetime
 
-from sqlalchemy import (Boolean, Column, DateTime, ForeignKey, Integer, String,
-                        select)
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import object_session, relationship
+from sqlalchemy.orm import relationship
 from sqlalchemy_utils import EmailType, PasswordType, force_auto_coercion
 
 from app.db.base_class import Base
@@ -20,15 +18,27 @@ class User(Base):
     email = Column(EmailType(50), unique=True, nullable=False)
     password = Column(PasswordType(schemes=["pbkdf2_sha512"]), nullable=False)
 
-    keys = relationship("UserKeys", back_populates="user", lazy='dynamic')
-    tokens = relationship("UserToken", back_populates="user", lazy='dynamic')
+    keys = relationship(
+        "UserKeys",
+        back_populates="user",
+        lazy='dynamic',
+        cascade="all, delete-orphan",
+    )
+    tokens = relationship(
+        "UserToken",
+        back_populates="user",
+        lazy='dynamic',
+        cascade="all, delete-orphan",
+    )
 
 
 class UserKeys(Base):
     __tablename__ = "user_keys"
 
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    user_id = Column(
+        Integer, ForeignKey("users.id", ondelete='CASCADE'), nullable=False
+    )
     public_key = Column(String(2000), nullable=False)
     is_revoked = Column(Boolean, default=False)
 
@@ -39,7 +49,9 @@ class UserToken(Base):
     __tablename__ = "user_tokens"
 
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    user_id = Column(
+        Integer, ForeignKey("users.id", ondelete='CASCADE'), nullable=False
+    )
     token = Column(
         UUID(as_uuid=True), unique=True, nullable=False, default=uuid.uuid4
     )

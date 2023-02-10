@@ -33,6 +33,11 @@ class UserCreate(UserBase):
     password: constr(strip_whitespace=True, min_length=8)
 
 
+class Login(BaseModel):
+    email: EmailStr
+    password: constr(strip_whitespace=True, min_length=8)
+
+
 class UserInDBBase(UserBase):
     id: Optional[int] = None
 
