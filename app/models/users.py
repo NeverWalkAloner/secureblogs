@@ -57,4 +57,4 @@ class UserToken(Base):
     )
     expires = Column(DateTime)
 
-    user = relationship("User", back_populates="tokens")
+    user = relationship("User", back_populates="tokens", lazy='joined')
