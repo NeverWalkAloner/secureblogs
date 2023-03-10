@@ -1,6 +1,14 @@
 import uuid
 
-from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String
+from sqlalchemy import (
+    Boolean,
+    Column,
+    DateTime,
+    ForeignKey,
+    Integer,
+    String,
+    Text,
+)
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from sqlalchemy_utils import EmailType, PasswordType, force_auto_coercion
@@ -30,6 +38,11 @@ class User(Base):
         lazy='dynamic',
         cascade="all, delete-orphan",
     )
+    groups = relationship(
+        "UserGroup",
+        secondary="user_group_association",
+        back_populates="users",
+    )
 
 
 class UserKeys(Base):
@@ -58,3 +71,25 @@ class UserToken(Base):
     expires = Column(DateTime)
 
     user = relationship("User", back_populates="tokens", lazy='joined')
+
+
+class UserGroup(Base):
+    __tablename__ = "user_groups"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(50))
+    user_keys = Column(Text)
+
+    users = relationship(
+        "User",
+        secondary="user_group_association",
+        back_populates="groups",
+    )
+
+
+class UserGroupAssociation(Base):
+    __tablename__ = "user_group_association"
+
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    group_id = Column(Integer, ForeignKey("user_groups.id"))

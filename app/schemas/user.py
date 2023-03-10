@@ -48,3 +48,15 @@ class UserInDBBase(UserBase):
 # Additional properties to return via API
 class User(UserInDBBase):
     token: TokenBase | None = None
+
+
+class UserKey(BaseModel):
+    public_key: str
+
+
+class UserKeyInDB(BaseModel):
+    id: int
+    public_key: str
+
+    class Config:
+        orm_mode = True

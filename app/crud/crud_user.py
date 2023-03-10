@@ -1,10 +1,10 @@
 from datetime import datetime, timedelta
 
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 
-from app.models.users import User, UserToken
+from app.models.users import User, UserToken, UserKeys
 from app.schemas.user import UserCreate
 
 
@@ -44,3 +44,21 @@ async def create_user_token(db: AsyncSession, user: User) -> UserToken:
     db.add(db_token)
     await db.commit()
     return db_token
+
+
+async def update_user_key(
+        db: AsyncSession,
+        user: User,
+        public_key: str,
+) -> UserKeys:
+    statement = (
+        update(UserKeys)
+        .where(UserKeys.user == user)
+        .values(is_revoked=True)
+    )
+    await db.execute(statement)
+    db_key = UserKeys(user=user, public_key=public_key)
+    db.add(db_key)
+    await db.commit()
+    await db.refresh(db_key)
+    return db_key
