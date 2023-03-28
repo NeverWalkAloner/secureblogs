@@ -1,8 +1,8 @@
 """Add user groups
 
-Revision ID: f0f3f9cb28f3
+Revision ID: 5a07084e85eb
 Revises: 1997dda4bccc
-Create Date: 2023-03-10 07:23:30.218362
+Create Date: 2023-03-28 07:17:19.264944
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'f0f3f9cb28f3'
+revision = '5a07084e85eb'
 down_revision = '1997dda4bccc'
 branch_labels = None
 depends_on = None
@@ -21,7 +21,6 @@ def upgrade() -> None:
     op.create_table('user_groups',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(length=50), nullable=True),
-    sa.Column('user_keys', sa.Text(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_user_groups_id'), 'user_groups', ['id'], unique=False)

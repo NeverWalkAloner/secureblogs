@@ -7,7 +7,6 @@ from sqlalchemy import (
     ForeignKey,
     Integer,
     String,
-    Text,
 )
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
@@ -42,6 +41,12 @@ class User(Base):
         "UserGroup",
         secondary="user_group_association",
         back_populates="users",
+    )
+    posts = relationship(
+        "Post",
+        back_populates="author",
+        lazy='joined',
+        cascade="all, delete-orphan",
     )
 
 
@@ -78,12 +83,17 @@ class UserGroup(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(50))
-    user_keys = Column(Text)
 
     users = relationship(
         "User",
         secondary="user_group_association",
         back_populates="groups",
+    )
+    posts = relationship(
+        "Post",
+        back_populates="user_group",
+        lazy='joined',
+        cascade="all, delete-orphan",
     )
 
 
