@@ -10,18 +10,37 @@ services:
     restart: unless-stopped
     volumes:
       - ".postgres-data:/var/lib/postgresql/data:delegated"
+  rabbitmq:
+    image: "rabbitmq:3.11"
+    restart: "unless-stopped"
+    volumes:
+      - ".rabbitmq-data:/var/lib/rabbitmq"
   web:
     build: .
     environment:
       - POSTGRES_DATABASE_URL=postgresql+asyncpg://root:root@db/postgres
       - SQLALCHEMY_DATABASE_URL=postgresql+asyncpg://root:root@db/appdb
       - TEST_SQLALCHEMY_DATABASE_URL=postgresql+asyncpg://root:root@db/testdb
+      - CELERY_BROKER_URL=pyamqp://guest@rabbitmq//
       - TEST_DB_NAME=testdb
       - WAIT_HOSTS=db:5432
     volumes:
-      - .:/fastapiwebsockets
+      - .:/secureblogs
     ports:
       - "8000:8000"
     restart: always
     depends_on:
       - db
+  celery:
+    build: .
+    environment:
+      - POSTGRES_DATABASE_URL=postgresql+asyncpg://root:root@db/postgres
+      - SQLALCHEMY_DATABASE_URL=postgresql+asyncpg://root:root@db/appdb
+      - TEST_SQLALCHEMY_DATABASE_URL=postgresql+asyncpg://root:root@db/testdb
+      - CELERY_BROKER_URL=pyamqp://guest@rabbitmq//
+      - TEST_DB_NAME=testdb
+      - WAIT_HOSTS=db:5432
+    command: celery --app=app.celery.workers worker --loglevel=inf
+    depends_on:
+      - db
+      - rabbitmq

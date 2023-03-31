@@ -4,7 +4,7 @@ from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 
-from app.models.users import User, UserToken, UserKeys
+from app.db.base import User, UserToken, UserKeys
 from app.schemas.user import UserCreate
 
 

@@ -1,5 +1,6 @@
 .idea/
 .postgres-data/
 .pytest_cache/
+.rabbitmq-data
 __pycache__/
 venv/
