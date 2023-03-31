@@ -93,7 +93,6 @@ class UserGroup(Base):
     posts = relationship(
         "Post",
         back_populates="user_group",
-        lazy='joined',
         cascade="all, delete-orphan",
     )
     keys = relationship("GroupKeys", back_populates="user_group")

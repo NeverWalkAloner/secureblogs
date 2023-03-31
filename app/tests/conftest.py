@@ -10,9 +10,11 @@ from sqlalchemy.orm import sessionmaker
 from app.api.deps import get_db
 from app.core.config import settings
 from app.crud.crud_user import create_user, create_user_token
-from app.db.base import Base, User, UserToken
+from app.db.base import Base, User, UserToken, UserGroup
 from app.main import app
 from app.schemas.user import UserCreate
+from app.schemas.user_group import UserGroupBase
+from app.crud.crud_user_group import create_user_group
 
 
 @pytest.fixture(scope="session")
@@ -86,6 +88,15 @@ async def user(db_session: AsyncSession) -> User:
     user_db = await create_user(db_session, user)
     yield user_db
     await db_session.delete(user_db)
+    await db_session.commit()
+
+
+@pytest_asyncio.fixture
+async def user_group(db_session: AsyncSession, user: User) -> UserGroup:
+    user_group = UserGroupBase(name="Hello")
+    user_group_db = await create_user_group(db_session, user, user_group)
+    yield user_group_db
+    await db_session.delete(user_group_db)
     await db_session.commit()
 
 
