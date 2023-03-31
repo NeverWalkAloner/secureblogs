@@ -27,20 +27,3 @@ class Post(Base):
 
     author = relationship("User", back_populates="posts")
     user_group = relationship("UserGroup", back_populates="posts")
-    keys = relationship("PostKeys", back_populates="post")
-
-
-class PostKeys(Base):
-    __tablename__ = "post_keys"
-
-    id = Column(Integer, primary_key=True, index=True)
-    post_id = Column(
-        Integer, ForeignKey("posts.id", ondelete='CASCADE'), nullable=False
-    )
-    public_key_id = Column(
-        Integer, ForeignKey("user_keys.id", ondelete='CASCADE'), nullable=False
-    )
-    encrypted_key = content = Column(Text)
-
-    post = relationship("Post", back_populates="keys")
-    public_key = relationship("UserKeys")
