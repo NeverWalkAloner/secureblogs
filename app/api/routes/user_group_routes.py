@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_current_user, get_db
-from app.celery.workers import test_task
+from app.celery_tasks.workers import test_task
 from app.crud import crud_user_group
 from app.db.base import UserGroup
 from app.models.users import User as UserModel

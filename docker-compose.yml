@@ -40,7 +40,7 @@ services:
       - CELERY_BROKER_URL=pyamqp://guest@rabbitmq//
       - TEST_DB_NAME=testdb
       - WAIT_HOSTS=db:5432
-    command: celery --app=app.celery.workers worker --loglevel=info
+    command: celery --app=app.celery_tasks.workers worker --loglevel=info
     depends_on:
       - db
       - rabbitmq
