@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_current_user, get_db
-from app.celery_tasks.workers import test_task
+from app.celery_tasks.workers import create_user_key
 from app.crud import crud_user_group
 from app.db.base import UserGroup
 from app.models.users import User as UserModel
@@ -22,7 +22,7 @@ async def create_user_group(
     user_group_db = await crud_user_group.create_user_group(
         db, user=current_user, user_group=user_group
     )
-    test_task.delay('hello')
+    create_user_key.delay(user_id=current_user.id, group_id=user_group_db.id)
     return user_group_db
 
 

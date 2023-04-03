@@ -13,6 +13,8 @@ services:
   rabbitmq:
     image: "rabbitmq:3.11"
     restart: "unless-stopped"
+    ports:
+      - "5672:5672"
     volumes:
       - ".rabbitmq-data:/var/lib/rabbitmq"
   web:
@@ -20,6 +22,7 @@ services:
     environment:
       - POSTGRES_DATABASE_URL=postgresql+asyncpg://root:root@db/postgres
       - SQLALCHEMY_DATABASE_URL=postgresql+asyncpg://root:root@db/appdb
+      - SYNC_SQLALCHEMY_DATABASE_URL=postgresql://root:root@db/appdb
       - TEST_SQLALCHEMY_DATABASE_URL=postgresql+asyncpg://root:root@db/testdb
       - CELERY_BROKER_URL=pyamqp://guest@rabbitmq//
       - TEST_DB_NAME=testdb
@@ -36,11 +39,14 @@ services:
     environment:
       - POSTGRES_DATABASE_URL=postgresql+asyncpg://root:root@db/postgres
       - SQLALCHEMY_DATABASE_URL=postgresql+asyncpg://root:root@db/appdb
+      - SYNC_SQLALCHEMY_DATABASE_URL=postgresql://root:root@db/appdb
       - TEST_SQLALCHEMY_DATABASE_URL=postgresql+asyncpg://root:root@db/testdb
       - CELERY_BROKER_URL=pyamqp://guest@rabbitmq//
       - TEST_DB_NAME=testdb
       - WAIT_HOSTS=db:5432
-    command: celery --app=app.celery_tasks.workers worker --loglevel=info
+    command: celery --app=app.celery_tasks.workers worker --loglevel=DEBUG
+    volumes:
+      - .:/secureblogs
     depends_on:
       - db
       - rabbitmq

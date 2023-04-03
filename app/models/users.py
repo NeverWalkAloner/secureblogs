@@ -118,7 +118,7 @@ class GroupKeys(Base):
     public_key_id = Column(
         Integer, ForeignKey("user_keys.id", ondelete='CASCADE'), nullable=False
     )
-    encrypted_key = content = Column(Text)
+    encrypted_key = Column(Text)
 
     user_group = relationship("UserGroup", back_populates="keys")
     public_key = relationship("UserKeys")
