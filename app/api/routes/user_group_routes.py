@@ -29,7 +29,7 @@ async def create_user_group(
 @router.get("/user_groups/", response_model=list[UserGroupInDBBase])
 async def get_user_groups_list(
     db: AsyncSession = Depends(get_db),
-    current_user: UserModel = Depends(get_current_user)
+    current_user: UserModel = Depends(get_current_user),
 ) -> list[UserGroup]:
     results = await crud_user_group.get_user_groups(db)
     return results

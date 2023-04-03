@@ -3,8 +3,8 @@ from typing import Union
 import uvicorn
 from fastapi import FastAPI
 
-from app.api.routes.user_routes import router
 from app.api.routes.user_group_routes import router as group_routers
+from app.api.routes.user_routes import router
 
 app = FastAPI()
 

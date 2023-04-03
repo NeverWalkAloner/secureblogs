@@ -10,11 +10,11 @@ from sqlalchemy.orm import sessionmaker
 from app.api.deps import get_db
 from app.core.config import settings
 from app.crud.crud_user import create_user, create_user_token
-from app.db.base import Base, User, UserToken, UserGroup
+from app.crud.crud_user_group import create_user_group
+from app.db.base import Base, User, UserGroup, UserToken
 from app.main import app
 from app.schemas.user import UserCreate
 from app.schemas.user_group import UserGroupBase
-from app.crud.crud_user_group import create_user_group
 
 
 @pytest.fixture(scope="session")

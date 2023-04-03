@@ -7,8 +7,8 @@ from cryptography.hazmat.primitives.serialization import load_pem_public_key
 from sqlalchemy import select
 
 from app.core.crypto_tools import asymmetric_encryption, generate_symmetric_key
+from app.db.base import GroupKeys, UserKeys
 from app.db.session import SyncSessionLocal
-from app.db.base import UserKeys, GroupKeys
 
 celery = Celery("secureblogs")
 celery.conf.broker_url = os.environ.get("CELERY_BROKER_URL")

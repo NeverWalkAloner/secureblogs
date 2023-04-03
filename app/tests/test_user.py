@@ -1,7 +1,7 @@
 import pytest
 from sqlalchemy import func, select
 
-from app.models.users import UserToken, UserKeys
+from app.models.users import UserKeys, UserToken
 
 
 @pytest.mark.asyncio
@@ -110,21 +110,20 @@ async def test_user_details_unauthorized(async_client, user):
 @pytest.mark.asyncio
 async def test_upgrade_public_key(async_client, db_session, token):
     request_data = {
-        "public_key":
-            "-----BEGIN PUBLIC KEY-----"
-            "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAkvRE10cEjZxHg80ckA4h"
-            "M2qn3OJLTSesvMHP6UiIzdHWWKTR0PerTV7tGSCySlNXMGVlncX+PA8Rwr1FzPj"
-            "wlw0Onuvy7pK4r1EyK6BD7ukadkjnggJ7vXF83SEzio02wzxpVo4pt3UPwzPvA9P"
-            "aM+EMefaIDHC89Oa3R4/Jsgbd+1koYaC2HHi22eBzCwHOTHd3YexfKgzUr1uSO1n"
-            "7F/jmazRjn3oWN8bWICqwM9C+nGe5RLXqwFAhV2PDPUKtsOvrQ0+yg5ZHk+zXldy"
-            "3bfIpiXWcI/yr6TcYeYtKzHXRwzuqBWSw3FR+UL4GiKnyODr1LAh31E9MMTnddEF"
-            "BwIDAQAB"
-            "-----END PUBLIC KEY-----"
+        "public_key": "-----BEGIN PUBLIC KEY-----"
+        "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAkvRE10cEjZxHg80ckA4h"
+        "M2qn3OJLTSesvMHP6UiIzdHWWKTR0PerTV7tGSCySlNXMGVlncX+PA8Rwr1FzPj"
+        "wlw0Onuvy7pK4r1EyK6BD7ukadkjnggJ7vXF83SEzio02wzxpVo4pt3UPwzPvA9P"
+        "aM+EMefaIDHC89Oa3R4/Jsgbd+1koYaC2HHi22eBzCwHOTHd3YexfKgzUr1uSO1n"
+        "7F/jmazRjn3oWN8bWICqwM9C+nGe5RLXqwFAhV2PDPUKtsOvrQ0+yg5ZHk+zXldy"
+        "3bfIpiXWcI/yr6TcYeYtKzHXRwzuqBWSw3FR+UL4GiKnyODr1LAh31E9MMTnddEF"
+        "BwIDAQAB"
+        "-----END PUBLIC KEY-----"
     }
     response = await async_client.post(
         "/users/me/public_key/",
         json=request_data,
-        headers={"Authorization": f"Bearer {token.token}"}
+        headers={"Authorization": f"Bearer {token.token}"},
     )
     assert response.status_code == 200
     keys_counts = await db_session.execute(select(func.count(UserKeys.id)))

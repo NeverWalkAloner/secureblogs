@@ -4,7 +4,7 @@ from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 
-from app.db.base import User, UserToken, UserKeys
+from app.db.base import User, UserKeys, UserToken
 from app.schemas.user import UserCreate
 
 
@@ -47,14 +47,12 @@ async def create_user_token(db: AsyncSession, user: User) -> UserToken:
 
 
 async def update_user_key(
-        db: AsyncSession,
-        user: User,
-        public_key: str,
+    db: AsyncSession,
+    user: User,
+    public_key: str,
 ) -> UserKeys:
     statement = (
-        update(UserKeys)
-        .where(UserKeys.user == user)
-        .values(is_revoked=True)
+        update(UserKeys).where(UserKeys.user == user).values(is_revoked=True)
     )
     await db.execute(statement)
     db_key = UserKeys(user=user, public_key=public_key)

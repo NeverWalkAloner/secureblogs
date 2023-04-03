@@ -1,14 +1,7 @@
 import uuid
 
-from sqlalchemy import (
-    Boolean,
-    Column,
-    DateTime,
-    ForeignKey,
-    Integer,
-    String,
-    Text,
-)
+from sqlalchemy import (Boolean, Column, DateTime, ForeignKey, Integer, String,
+                        Text)
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from sqlalchemy_utils import EmailType, PasswordType, force_auto_coercion
@@ -113,7 +106,7 @@ class GroupKeys(Base):
     group_id = Column(
         Integer,
         ForeignKey("user_groups.id", ondelete='CASCADE'),
-        nullable=False
+        nullable=False,
     )
     public_key_id = Column(
         Integer, ForeignKey("user_keys.id", ondelete='CASCADE'), nullable=False
