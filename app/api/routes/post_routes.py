@@ -2,21 +2,26 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_current_user, get_db
-from app.crud import crud_user
+from app.crud import crud_post
 from app.models.users import User as UserModel
-from app.schemas.user import Login, User, UserCreate, UserKey, UserKeyInDB
+from app.schemas.post import PostBase, PostInDBBase
+from app.celery_tasks.workers import encrypt_post_content
 
 router = APIRouter()
 
 
-@router.post("/posts/", response_model=UserKeyInDB)
+@router.post("/posts/", response_model=PostInDBBase, status_code=201)
 async def create_post(
-    user_key: UserKey,
+    post: PostBase,
     db: AsyncSession = Depends(get_db),
     current_user: UserModel = Depends(get_current_user),
 ):
-    return await crud_user.update_user_key(
-        db,
-        current_user,
-        user_key.public_key,
+    plain_content = post.content
+    post.content = ""
+    post = await crud_post.create_post(
+        db=db,
+        post=post,
+        author=current_user,
     )
+    encrypt_post_content.delay(post_id=post.id, content=plain_content)
+    return post

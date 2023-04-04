@@ -18,7 +18,7 @@ def serialize_private_key(keypair: RSAPrivateKey) -> str:
         format=serialization.PrivateFormat.TraditionalOpenSSL,
         encryption_algorithm=serialization.NoEncryption(),
     )
-    return pem.decode('utf-8')
+    return pem
 
 
 def serialize_public_key(keypair: RSAPrivateKey) -> str:
@@ -28,7 +28,7 @@ def serialize_public_key(keypair: RSAPrivateKey) -> str:
         encoding=serialization.Encoding.PEM,
         format=serialization.PublicFormat.SubjectPublicKeyInfo,
     )
-    return pem.decode('utf-8')
+    return pem
 
 
 keypair = generate_asymmetric_keys()

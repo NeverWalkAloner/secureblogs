@@ -88,7 +88,6 @@ class UserGroup(Base):
         back_populates="user_group",
         cascade="all, delete-orphan",
     )
-    keys = relationship("GroupKeys", back_populates="user_group")
 
 
 class UserGroupAssociation(Base):
@@ -97,21 +96,3 @@ class UserGroupAssociation(Base):
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey("users.id"))
     group_id = Column(Integer, ForeignKey("user_groups.id"))
-
-
-class GroupKeys(Base):
-    __tablename__ = "group_keys"
-
-    id = Column(Integer, primary_key=True, index=True)
-    group_id = Column(
-        Integer,
-        ForeignKey("user_groups.id", ondelete='CASCADE'),
-        nullable=False,
-    )
-    public_key_id = Column(
-        Integer, ForeignKey("user_keys.id", ondelete='CASCADE'), nullable=False
-    )
-    encrypted_key = Column(Text)
-
-    user_group = relationship("UserGroup", back_populates="keys")
-    public_key = relationship("UserKeys")

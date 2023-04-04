@@ -16,8 +16,7 @@ async def test_user_groups_success(async_client, user, user_group, token):
 
 
 @pytest.mark.asyncio
-@mock.patch('app.api.routes.user_group_routes.create_user_key.delay')
-async def test_create_group_success(mock_task, async_client, user, token):
+async def test_create_group_success(async_client, user, token):
     request_data = {"name": "common group"}
     response = await async_client.post(
         "/user_groups/",
