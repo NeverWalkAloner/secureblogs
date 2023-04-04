@@ -31,7 +31,6 @@ def encrypt_post_content(post_id: int, content: str):
             .values(content=encrypted_content)
         )
         post = db.execute(post_statement).fetchone()
-        print(post)
 
         # fetch user's public keys from DB
         users_subquery = (
@@ -44,15 +43,18 @@ def encrypt_post_content(post_id: int, content: str):
             & (UserKeys.is_revoked == False)
         )
         public_keys = db.execute(statement).scalars().all()
+        db_post_keys = []
         for public_key in public_keys:
             # Save generated keys in DB
             public_pem_data = public_key.public_key
             public_key_object = load_pem_public_key(public_pem_data.encode())
             encrypted_key = asymmetric_encryption(key, public_key_object)
-            db_post_key = PostKeys(
-                post_id=post_id,
-                public_key_id=public_key.id,
-                encrypted_key=encrypted_key,
+            db_post_keys.append(
+                PostKeys(
+                    post_id=post_id,
+                    public_key_id=public_key.id,
+                    encrypted_key=encrypted_key,
+                )
             )
-            db.add(db_post_key)
+        db.bulk_save_objects(db_post_keys)
         db.commit()
