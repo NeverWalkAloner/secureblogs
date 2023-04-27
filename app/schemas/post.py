@@ -15,3 +15,9 @@ class PostInDBBase(PostBase):
 
     class Config:
         orm_mode = True
+
+
+class PaginatedPosts(BaseModel):
+    total_count: int
+    per_page: int
+    posts: list[PostInDBBase]

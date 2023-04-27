@@ -9,10 +9,12 @@ from sqlalchemy.orm import sessionmaker
 
 from app.api.deps import get_db
 from app.core.config import settings
+from app.crud.crud_post import create_post
 from app.crud.crud_user import create_user, create_user_token
 from app.crud.crud_user_group import create_user_group
-from app.db.base import Base, User, UserGroup, UserToken
+from app.db.base import Base, Post, User, UserGroup, UserToken
 from app.main import app
+from app.schemas.post import PostBase
 from app.schemas.user import UserCreate
 from app.schemas.user_group import UserGroupBase
 
@@ -97,6 +99,20 @@ async def user_group(db_session: AsyncSession, user: User) -> UserGroup:
     user_group_db = await create_user_group(db_session, user, user_group)
     yield user_group_db
     await db_session.delete(user_group_db)
+    await db_session.commit()
+
+
+@pytest_asyncio.fixture
+async def posts(
+    db_session: AsyncSession, user_group: UserGroup, user: User
+) -> list[Post]:
+    post1 = PostBase(title="Hello", content="World", group_id=user_group.id)
+    post2 = PostBase(title="New", content="Post", group_id=user_group.id)
+    post1 = await create_post(db_session, post1, user)
+    post2 = await create_post(db_session, post2, user)
+    yield [post2, post1]
+    await db_session.delete(post1)
+    await db_session.delete(post2)
     await db_session.commit()
 
 
