@@ -1,12 +1,11 @@
-from datetime import datetime, timedelta
 from typing import Optional
 
-from sqlalchemy import func, select, update
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import contains_eager, joinedload
 
 from app.core.config import settings
-from app.db.base import Post, User
+from app.db.base import Post, PostKeys, User, UserKeys
 from app.schemas.post import PostBase
 
 
@@ -49,3 +48,17 @@ async def get_posts_count(
         statement = statement.where(Post.group_id == user_group)
     result = await db.execute(statement)
     return result.scalar()
+
+
+async def get_post(db: AsyncSession, post_id: int, user: User) -> Post:
+    statement = (
+        select(Post)
+        .join(Post.keys)
+        .join(PostKeys.public_key)
+        .filter((UserKeys.is_revoked == False) & (UserKeys.user_id == user.id))
+        .options(contains_eager(Post.keys).contains_eager(PostKeys.public_key))
+        .execution_options(populate_existing=True)
+        .where(Post.id == post_id)
+    )
+    result = await db.execute(statement)
+    return result.scalars().first()

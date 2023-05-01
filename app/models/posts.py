@@ -21,7 +21,11 @@ class Post(Base):
 
     author = relationship("User", back_populates="posts")
     user_group = relationship("UserGroup", back_populates="posts")
-    keys = relationship("PostKeys", back_populates="post")
+    keys = relationship(
+        "PostKeys",
+        back_populates="post",
+        cascade="all, delete-orphan",
+    )
 
 
 class PostKeys(Base):

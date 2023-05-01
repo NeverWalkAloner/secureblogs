@@ -8,7 +8,12 @@ from app.celery_tasks.workers import encrypt_post_content
 from app.core.config import settings
 from app.crud import crud_post
 from app.models.users import User as UserModel
-from app.schemas.post import PaginatedPosts, PostBase, PostInDBBase
+from app.schemas.post import (
+    PaginatedPosts,
+    PostBase,
+    PostDetails,
+    PostInDBBase,
+)
 
 router = APIRouter()
 
@@ -41,3 +46,12 @@ async def get_posts(
     return PaginatedPosts(
         total_count=posts_count, per_page=settings.MAX_PER_PAGE, posts=posts
     )
+
+
+@router.get("/posts/{post_id}/", response_model=PostDetails)
+async def get_post(
+    post_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: UserModel = Depends(get_current_user),
+):
+    return await crud_post.get_post(db, post_id, current_user)

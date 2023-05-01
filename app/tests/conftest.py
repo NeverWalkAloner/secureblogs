@@ -3,16 +3,24 @@ import asyncio
 import pytest
 import pytest_asyncio
 from httpx import AsyncClient
-from sqlalchemy import text
+from sqlalchemy import delete, insert, text
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
 from app.api.deps import get_db
 from app.core.config import settings
 from app.crud.crud_post import create_post
-from app.crud.crud_user import create_user, create_user_token
+from app.crud.crud_user import create_user, create_user_token, update_user_key
 from app.crud.crud_user_group import create_user_group
-from app.db.base import Base, Post, User, UserGroup, UserToken
+from app.db.base import (
+    Base,
+    Post,
+    PostKeys,
+    User,
+    UserGroup,
+    UserKeys,
+    UserToken,
+)
 from app.main import app
 from app.schemas.post import PostBase
 from app.schemas.user import UserCreate
@@ -120,3 +128,30 @@ async def posts(
 async def token(db_session: AsyncSession, user: User) -> UserToken:
     token_db = await create_user_token(db_session, user)
     return token_db
+
+
+@pytest_asyncio.fixture
+async def user_key(db_session: AsyncSession, user: User) -> UserKeys:
+    user_key_db = await update_user_key(db_session, user, "public_key")
+    yield user_key_db
+    await db_session.delete(user_key_db)
+    await db_session.commit()
+
+
+@pytest_asyncio.fixture
+async def post_keys(
+    db_session: AsyncSession, user_key: UserKeys, posts: list[Post]
+) -> UserKeys:
+    post_keys = []
+    for post in posts:
+        post_keys.append(
+            dict(
+                post_id=post.id,
+                public_key_id=user_key.id,
+                encrypted_key="encrypted_key",
+            )
+        )
+    db_post_keys = await db_session.scalars(
+        insert(PostKeys).returning(PostKeys), post_keys
+    )
+    yield db_post_keys.all()

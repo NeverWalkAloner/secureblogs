@@ -3,6 +3,7 @@ from unittest import mock
 import pytest
 
 from app.core.config import settings
+from app.crud.crud_post import get_post
 
 
 @pytest.mark.asyncio
@@ -40,3 +41,20 @@ async def test_posts_list_success(async_client, posts, token):
         assert post["content"] == posts[indx].content
         assert post["group_id"] == posts[indx].group_id
         assert post["id"] == posts[indx].id
+
+
+@pytest.mark.asyncio
+async def test_post_details_success(async_client, posts, post_keys, token):
+    post_db = posts[0]
+    response = await async_client.get(
+        f"/posts/{post_db.id}/",
+        headers={"Authorization": f"Bearer {token.token}"},
+    )
+    assert response.status_code == 200
+    post = response.json()
+    assert post["title"] == post_db.title
+    assert post["content"] == post_db.content
+    assert post["group_id"] == post_db.group_id
+    assert post["id"] == post_db.id
+    assert len(post["keys"]) == 1
+    assert post["keys"][0]["encrypted_key"] == post_keys[0].encrypted_key
