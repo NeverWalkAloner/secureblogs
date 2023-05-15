@@ -1,4 +1,4 @@
-from sqlalchemy import select, exists
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.base import User, UserGroup, UserGroupAssociation
@@ -26,11 +26,11 @@ async def get_user_groups(db: AsyncSession) -> list[UserGroup]:
 async def join_user_group(
     db: AsyncSession, user: User, group_id: int
 ) -> None:
-    exists_statement = select(exists(UserGroupAssociation)).where(
+    exists_statement = select(UserGroupAssociation.id).where(
         (UserGroupAssociation.user_id == user.id) & (UserGroupAssociation.group_id == group_id)
     )
     result = await db.execute(exists_statement)
-    if result.scalar_one():
+    if result.scalars().first():
         return None
     db_user_group_association = UserGroupAssociation(
         user_id=user.id,

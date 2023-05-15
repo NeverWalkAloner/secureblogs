@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import contains_eager, joinedload
 
 from app.core.config import settings
-from app.db.base import Post, PostKeys, User, UserKeys
+from app.db.base import Post, PostKeys, ReadPostRequest, User, UserKeys
 from app.schemas.post import PostBase
 
 
@@ -62,3 +62,21 @@ async def get_post(db: AsyncSession, post_id: int, user: User) -> Post:
     )
     result = await db.execute(statement)
     return result.scalars().first()
+
+
+async def add_read_post_request(
+    db: AsyncSession, user: User, post_id: int
+) -> None:
+    exists_statement = select(ReadPostRequest.id).where(
+        (ReadPostRequest.user_id == user.id)
+        & (ReadPostRequest.post_id == post_id)
+    )
+    result = await db.execute(exists_statement)
+    if result.scalars().first():
+        return None
+    db_read_post_request = ReadPostRequest(
+        user_id=user.id,
+        post_id=post_id,
+    )
+    db.add(db_read_post_request)
+    await db.commit()

@@ -44,3 +44,20 @@ class PostKeys(Base):
 
     post = relationship("Post", back_populates="keys")
     public_key = relationship("UserKeys")
+
+
+class ReadPostRequest(Base):
+    __tablename__ = "read_post_request"
+
+    id = Column(Integer, primary_key=True, index=True)
+    post_id = Column(
+        Integer,
+        ForeignKey("posts.id", ondelete='CASCADE'),
+        nullable=False,
+    )
+    user_id = Column(
+        Integer, ForeignKey("users.id", ondelete='CASCADE'), nullable=False
+    )
+
+    post = relationship("Post")
+    requester = relationship("User")

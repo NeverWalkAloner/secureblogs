@@ -1,9 +1,8 @@
-from unittest import mock
-
 import pytest
+from sqlalchemy import func, select
 
 from app.core.config import settings
-from app.crud.crud_post import get_post
+from app.db.base import ReadPostRequest
 
 
 @pytest.mark.asyncio
@@ -58,3 +57,21 @@ async def test_post_details_success(async_client, posts, post_keys, token):
     assert post["id"] == post_db.id
     assert len(post["keys"]) == 1
     assert post["keys"][0]["encrypted_key"] == post_keys[0].encrypted_key
+
+
+@pytest.mark.asyncio
+async def test_request_post_read_success(
+    async_client, db_session, posts, user, token
+):
+    post_db = posts[0]
+    response = await async_client.post(
+        f"/posts/{post_db.id}/request_read/",
+        headers={"Authorization": f"Bearer {token.token}"},
+    )
+    assert response.status_code == 204
+    users_in_group = await db_session.execute(
+        select(func.count(ReadPostRequest.id)).where(
+            ReadPostRequest.user_id == user.id
+        )
+    )
+    assert users_in_group.scalar_one() == 1

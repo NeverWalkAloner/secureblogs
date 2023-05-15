@@ -1,6 +1,6 @@
 from typing import Optional
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_current_user, get_db
@@ -54,4 +54,16 @@ async def get_post(
     db: AsyncSession = Depends(get_db),
     current_user: UserModel = Depends(get_current_user),
 ):
-    return await crud_post.get_post(db, post_id, current_user)
+    post = await crud_post.get_post(db, post_id, current_user)
+    if not post:
+        raise HTTPException(status_code=404)
+    return post
+
+
+@router.post("/posts/{post_id}/request_read/", status_code=204)
+async def add_read_post_request(
+    post_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: UserModel = Depends(get_current_user),
+):
+    await crud_post.add_read_post_request(db, current_user, post_id)
