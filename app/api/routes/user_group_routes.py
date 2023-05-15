@@ -31,3 +31,12 @@ async def get_user_groups_list(
 ) -> list[UserGroup]:
     results = await crud_user_group.get_user_groups(db)
     return results
+
+
+@router.post("/user_groups/{group_id}/", status_code=204)
+async def join_group(
+    group_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: UserModel = Depends(get_current_user),
+):
+    await crud_user_group.join_user_group(db, current_user, group_id)
