@@ -12,15 +12,8 @@ from app.core.config import settings
 from app.crud.crud_post import create_post
 from app.crud.crud_user import create_user, create_user_token, update_user_key
 from app.crud.crud_user_group import create_user_group
-from app.db.base import (
-    Base,
-    Post,
-    PostKeys,
-    User,
-    UserGroup,
-    UserKeys,
-    UserToken,
-)
+from app.db.base import (Base, Post, PostKeys, User, UserGroup, UserKeys,
+                         UserToken)
 from app.main import app
 from app.schemas.post import PostBase
 from app.schemas.user import UserCreate

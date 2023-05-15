@@ -1,19 +1,13 @@
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import APIRouter, HTTPException
 
-from app.api.deps import get_current_user, get_db
+from app.api.deps import CurrentUser, DBSession
 from app.celery_tasks.workers import encrypt_post_content
 from app.core.config import settings
 from app.crud import crud_post
-from app.models.users import User as UserModel
-from app.schemas.post import (
-    PaginatedPosts,
-    PostBase,
-    PostDetails,
-    PostInDBBase,
-)
+from app.schemas.post import (PaginatedPosts, PostBase, PostDetails,
+                              PostInDBBase)
 
 router = APIRouter()
 
@@ -21,8 +15,8 @@ router = APIRouter()
 @router.post("/posts/", response_model=PostInDBBase, status_code=201)
 async def create_post(
     post: PostBase,
-    db: AsyncSession = Depends(get_db),
-    current_user: UserModel = Depends(get_current_user),
+    db: DBSession,
+    current_user: CurrentUser,
 ):
     plain_content = post.content
     post.content = ""
@@ -37,7 +31,7 @@ async def create_post(
 
 @router.get("/posts/", response_model=PaginatedPosts)
 async def get_posts(
-    db: AsyncSession = Depends(get_db),
+    db: DBSession,
     page: int = 1,
     user_group: Optional[int] = None,
 ):
@@ -51,8 +45,8 @@ async def get_posts(
 @router.get("/posts/{post_id}/", response_model=PostDetails)
 async def get_post(
     post_id: int,
-    db: AsyncSession = Depends(get_db),
-    current_user: UserModel = Depends(get_current_user),
+    db: DBSession,
+    current_user: CurrentUser,
 ):
     post = await crud_post.get_post(db, post_id, current_user)
     if not post:
@@ -63,7 +57,7 @@ async def get_post(
 @router.post("/posts/{post_id}/request_read/", status_code=204)
 async def add_read_post_request(
     post_id: int,
-    db: AsyncSession = Depends(get_db),
-    current_user: UserModel = Depends(get_current_user),
+    db: DBSession,
+    current_user: CurrentUser,
 ):
     await crud_post.add_read_post_request(db, current_user, post_id)

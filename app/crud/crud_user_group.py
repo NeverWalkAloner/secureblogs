@@ -23,11 +23,10 @@ async def get_user_groups(db: AsyncSession) -> list[UserGroup]:
     return result.scalars().all()
 
 
-async def join_user_group(
-    db: AsyncSession, user: User, group_id: int
-) -> None:
+async def join_user_group(db: AsyncSession, user: User, group_id: int) -> None:
     exists_statement = select(UserGroupAssociation.id).where(
-        (UserGroupAssociation.user_id == user.id) & (UserGroupAssociation.group_id == group_id)
+        (UserGroupAssociation.user_id == user.id)
+        & (UserGroupAssociation.group_id == group_id)
     )
     result = await db.execute(exists_statement)
     if result.scalars().first():

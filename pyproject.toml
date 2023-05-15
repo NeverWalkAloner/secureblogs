@@ -14,7 +14,7 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.11"
-fastapi = "^0.88.0"
+fastapi = "0.95.1"
 uvicorn = "^0.20.0"
 psycopg2 = "^2.9.5"
 alembic = "^1.8.1"
