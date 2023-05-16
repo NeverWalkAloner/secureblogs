@@ -3,7 +3,7 @@ import asyncio
 import pytest
 import pytest_asyncio
 from httpx import AsyncClient
-from sqlalchemy import delete, insert, text
+from sqlalchemy import insert, text
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -12,8 +12,16 @@ from app.core.config import settings
 from app.crud.crud_post import create_post
 from app.crud.crud_user import create_user, create_user_token, update_user_key
 from app.crud.crud_user_group import create_user_group
-from app.db.base import (Base, Post, PostKeys, User, UserGroup, UserKeys,
-                         UserToken)
+from app.db.base import (
+    Base,
+    Post,
+    PostKeys,
+    ReadPostRequest,
+    User,
+    UserGroup,
+    UserKeys,
+    UserToken,
+)
 from app.main import app
 from app.schemas.post import PostBase
 from app.schemas.user import UserCreate
@@ -148,3 +156,22 @@ async def post_keys(
         insert(PostKeys).returning(PostKeys), post_keys
     )
     yield db_post_keys.all()
+
+
+@pytest_asyncio.fixture
+async def read_post_requests(
+    db_session: AsyncSession, user_key: UserKeys, posts: list[Post]
+) -> ReadPostRequest:
+    post_requests = []
+    for post in posts:
+        post_requests.append(
+            dict(
+                post_id=post.id,
+                user_id=user_key.user_id,
+                public_key_id=user_key.id,
+            )
+        )
+    db_post_requests = await db_session.scalars(
+        insert(ReadPostRequest).returning(ReadPostRequest), post_requests
+    )
+    yield db_post_requests.all()

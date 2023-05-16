@@ -6,8 +6,12 @@ from app.api.deps import CurrentUser, DBSession
 from app.celery_tasks.workers import encrypt_post_content
 from app.core.config import settings
 from app.crud import crud_post
-from app.schemas.post import (PaginatedPosts, PostBase, PostDetails,
-                              PostInDBBase)
+from app.schemas.post import (
+    PaginatedPosts,
+    PostBase,
+    PostDetails,
+    PostInDBBase,
+)
 
 router = APIRouter()
 
@@ -61,3 +65,14 @@ async def add_read_post_request(
     current_user: CurrentUser,
 ):
     await crud_post.add_read_post_request(db, current_user, post_id)
+
+
+@router.post(
+    "/posts/{post_id}/request_read/{request_id}/deny/", status_code=204
+)
+async def delete_read_post_request(
+    request_id: int,
+    db: DBSession,
+    current_user: CurrentUser,
+):
+    await crud_post.delete_read_post_request(db, request_id)

@@ -61,7 +61,7 @@ async def test_post_details_success(async_client, posts, post_keys, token):
 
 @pytest.mark.asyncio
 async def test_request_post_read_success(
-    async_client, db_session, posts, user, token
+    async_client, db_session, posts, user, user_key, token
 ):
     post_db = posts[0]
     response = await async_client.post(
@@ -75,3 +75,27 @@ async def test_request_post_read_success(
         )
     )
     assert users_in_group.scalar_one() == 1
+
+
+@pytest.mark.asyncio
+async def test_deny_read_post_request_success(
+    async_client, db_session, posts, token, read_post_requests
+):
+    post_db = posts[0]
+    users_in_group = await db_session.execute(
+        select(func.count(ReadPostRequest.id)).where(
+            ReadPostRequest.post_id == post_db.id
+        )
+    )
+    assert users_in_group.scalar_one() == 1
+    response = await async_client.post(
+        f"/posts/{post_db.id}/request_read/{read_post_requests[0].id}/deny/",
+        headers={"Authorization": f"Bearer {token.token}"},
+    )
+    assert response.status_code == 204
+    users_in_group = await db_session.execute(
+        select(func.count(ReadPostRequest.id)).where(
+            ReadPostRequest.post_id == post_db.id
+        )
+    )
+    assert users_in_group.scalar_one() == 0

@@ -1,6 +1,6 @@
 from typing import Optional
 
-from sqlalchemy import func, select
+from sqlalchemy import delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import contains_eager, joinedload
 
@@ -74,9 +74,24 @@ async def add_read_post_request(
     result = await db.execute(exists_statement)
     if result.scalars().first():
         return None
+    public_key_statement = select(UserKeys).where(
+        (UserKeys.is_revoked == False) & (UserKeys.user_id == user.id)
+    )
+    result = await db.execute(public_key_statement)
+    if not (public_key := result.scalars().first()):
+        return None
     db_read_post_request = ReadPostRequest(
         user_id=user.id,
         post_id=post_id,
+        public_key=public_key,
     )
     db.add(db_read_post_request)
+    await db.commit()
+
+
+async def delete_read_post_request(db: AsyncSession, request_id: int) -> None:
+    exists_statement = delete(ReadPostRequest).where(
+        ReadPostRequest.id == request_id
+    )
+    await db.execute(exists_statement)
     await db.commit()

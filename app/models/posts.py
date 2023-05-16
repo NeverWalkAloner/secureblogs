@@ -58,6 +58,10 @@ class ReadPostRequest(Base):
     user_id = Column(
         Integer, ForeignKey("users.id", ondelete='CASCADE'), nullable=False
     )
+    public_key_id = Column(
+        Integer, ForeignKey("user_keys.id", ondelete='CASCADE'), nullable=False
+    )
 
     post = relationship("Post")
     requester = relationship("User")
+    public_key = relationship("UserKeys")
