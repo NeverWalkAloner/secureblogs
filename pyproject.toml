@@ -21,7 +21,7 @@ alembic = "^1.8.1"
 aiohttp = "^3.8.3"
 pytest = "^7.2.0"
 SQLAlchemy-Utils = "^0.38.3"
-websockets = "^10.4"
+websockets = "11.0.3"
 sqlalchemy = {extras = ["asyncio"], version = "^2.0.1"}
 greenlet = "^2.0.1"
 passlib = "^1.7.4"
