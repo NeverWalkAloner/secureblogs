@@ -6,7 +6,7 @@ from sqlalchemy.orm import contains_eager, joinedload
 
 from app.core.config import settings
 from app.db.base import Post, PostKeys, ReadPostRequest, User, UserKeys
-from app.schemas.post import PostBase
+from app.schemas.post import PostBase, PostKey
 
 
 async def create_post(db: AsyncSession, post: PostBase, author: User) -> Post:
@@ -89,9 +89,31 @@ async def add_read_post_request(
     await db.commit()
 
 
-async def delete_read_post_request(db: AsyncSession, request_id: int) -> None:
+async def delete_read_post_request(
+    db: AsyncSession, post_id: int, request_id: int
+) -> None:
     exists_statement = delete(ReadPostRequest).where(
-        ReadPostRequest.id == request_id
+        (ReadPostRequest.id == request_id)
+        & (ReadPostRequest.post_id == post_id)
     )
     await db.execute(exists_statement)
     await db.commit()
+
+
+async def create_post_key(
+    db: AsyncSession, post_id: int, request_id: int, post_key: PostKey
+) -> PostKeys | None:
+    exists_statement = select(ReadPostRequest).where(
+        (ReadPostRequest.id == request_id)
+        & (ReadPostRequest.post_id == post_id)
+    )
+    result = await db.execute(exists_statement)
+    if not (post_request := result.scalars().first()):
+        return None
+    db_post_key = PostKeys(
+        post_id=post_id,
+        public_key_id=post_request.public_key_id,
+        encrypted_key=post_key.encrypted_key,
+    )
+    db.add(db_post_key)
+    return await db.commit()

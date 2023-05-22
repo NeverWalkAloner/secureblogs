@@ -2,7 +2,7 @@ import pytest
 from sqlalchemy import func, select
 
 from app.core.config import settings
-from app.db.base import ReadPostRequest
+from app.db.base import PostKeys, ReadPostRequest
 
 
 @pytest.mark.asyncio
@@ -82,20 +82,48 @@ async def test_deny_read_post_request_success(
     async_client, db_session, posts, token, read_post_requests
 ):
     post_db = posts[0]
-    users_in_group = await db_session.execute(
+    active_post_requests = await db_session.execute(
         select(func.count(ReadPostRequest.id)).where(
             ReadPostRequest.post_id == post_db.id
         )
     )
-    assert users_in_group.scalar_one() == 1
+    assert active_post_requests.scalar_one() == 1
     response = await async_client.post(
         f"/posts/{post_db.id}/request_read/{read_post_requests[0].id}/deny/",
         headers={"Authorization": f"Bearer {token.token}"},
     )
     assert response.status_code == 204
-    users_in_group = await db_session.execute(
+    active_post_requests = await db_session.execute(
         select(func.count(ReadPostRequest.id)).where(
             ReadPostRequest.post_id == post_db.id
         )
     )
-    assert users_in_group.scalar_one() == 0
+    assert active_post_requests.scalar_one() == 0
+
+
+@pytest.mark.asyncio
+async def test_accept_read_post_request_success(
+    async_client, db_session, posts, token, read_post_requests
+):
+    post_db = posts[0]
+    request_data = {"encrypted_key": "encrypted key"}
+    response = await async_client.post(
+        f"/posts/{post_db.id}/request_read/{read_post_requests[0].id}/accept/",
+        json=request_data,
+        headers={"Authorization": f"Bearer {token.token}"},
+    )
+    assert response.status_code == 204
+    active_post_requests = await db_session.execute(
+        select(func.count(ReadPostRequest.id)).where(
+            ReadPostRequest.post_id == post_db.id
+        )
+    )
+    post_key_query = await db_session.execute(
+        select(PostKeys).where(
+            PostKeys.post_id == post_db.id,
+            PostKeys.public_key_id == read_post_requests[0].public_key_id,
+        )
+    )
+    post_key = post_key_query.scalars().first()
+    assert active_post_requests.scalar_one() == 0
+    assert post_key.encrypted_key == "encrypted key"

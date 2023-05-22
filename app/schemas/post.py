@@ -30,5 +30,9 @@ class PostKeyInDB(BaseModel):
         orm_mode = True
 
 
+class PostKey(BaseModel):
+    encrypted_key: str
+
+
 class PostDetails(PostInDBBase):
     keys: list[PostKeyInDB] | None

@@ -11,6 +11,7 @@ from app.schemas.post import (
     PostBase,
     PostDetails,
     PostInDBBase,
+    PostKey,
 )
 
 router = APIRouter()
@@ -71,8 +72,23 @@ async def add_read_post_request(
     "/posts/{post_id}/request_read/{request_id}/deny/", status_code=204
 )
 async def delete_read_post_request(
+    post_id: int,
     request_id: int,
     db: DBSession,
     current_user: CurrentUser,
 ):
-    await crud_post.delete_read_post_request(db, request_id)
+    await crud_post.delete_read_post_request(db, post_id, request_id)
+
+
+@router.post(
+    "/posts/{post_id}/request_read/{request_id}/accept/", status_code=204
+)
+async def accept_read_post_request(
+    post_id: int,
+    request_id: int,
+    post_key: PostKey,
+    db: DBSession,
+    current_user: CurrentUser,
+):
+    await crud_post.create_post_key(db, post_id, request_id, post_key)
+    await crud_post.delete_read_post_request(db, post_id, request_id)
