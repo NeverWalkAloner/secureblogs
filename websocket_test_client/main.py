@@ -1,11 +1,31 @@
-from websockets.sync.client import connect
+import argparse
+
+from websockets import connect
+
+import asyncio
+
+parser = argparse.ArgumentParser(description='Connect to websocket')
+parser.add_argument(
+    'token',
+    type=str,
+    help='access token',
+)
 
 
-def hello():
-    with connect("ws://localhost:8765") as websocket:
-        websocket.send("Hello world!")
-        message = websocket.recv()
-        print(f"Received: {message}")
+async def listen(token: str):
+    async with connect(
+        f"ws://localhost:8000/ws/post_request?token={token}"
+    ) as websocket:
+        await websocket.send("Hello world!")
+        while True:
+            message = await websocket.recv()
+            print(f"Received: {message}")
+            await asyncio.sleep(1)
+            await websocket.send("Hello world!")
+            message = await websocket.recv()
+            print(f"Received: {message}")
 
 
-hello()
+if __name__ == '__main__':
+    args = parser.parse_args()
+    asyncio.run(listen(args.token))
