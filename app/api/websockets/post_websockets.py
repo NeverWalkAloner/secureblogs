@@ -4,15 +4,16 @@ from fastapi import (
     APIRouter,
     Depends,
     Query,
+    status,
     WebSocket,
     WebSocketDisconnect,
     WebSocketException,
-    status,
 )
 
 from app.api.deps import DBSession
 from app.api.websockets.managers import ws_manager
 from app.crud.crud_user import get_user_by_token
+
 
 router = APIRouter()
 

@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional
 
-from pydantic import UUID4, BaseModel, EmailStr, Field, validator
+from pydantic import BaseModel, EmailStr, Field, UUID4, validator
 from pydantic.types import constr
 
 

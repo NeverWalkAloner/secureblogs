@@ -4,6 +4,7 @@ from app.api.deps import CurrentUser, DBSession
 from app.crud import crud_user
 from app.schemas.user import Login, User, UserCreate, UserKey, UserKeyInDB
 
+
 router = APIRouter()
 
 

@@ -5,6 +5,7 @@ from app.crud import crud_user_group
 from app.db.base import UserGroup
 from app.schemas.user_group import UserGroupBase, UserGroupInDBBase
 
+
 router = APIRouter()
 
 

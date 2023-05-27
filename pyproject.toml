@@ -5,6 +5,12 @@ line_length = 79
 skip_string_normalization = true
 target_version = ["py311"]
 
+[tool.isort]
+profile = "attrs"
+combine_as_imports = true
+force_alphabetical_sort_within_sections = true
+lines_between_types = 0
+
 [tool.poetry]
 name = "secureblogs"
 version = "0.1.0"

@@ -11,9 +11,10 @@ from sqlalchemy import (
 )
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
-from sqlalchemy_utils import EmailType, PasswordType, force_auto_coercion
+from sqlalchemy_utils import EmailType, force_auto_coercion, PasswordType
 
 from app.db.base_class import Base
+
 
 force_auto_coercion()
 

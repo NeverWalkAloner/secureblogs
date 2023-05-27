@@ -14,6 +14,7 @@ from app.core.crypto_tools import (
 from app.db.base import Post, PostKeys, User, UserGroup, UserKeys
 from app.db.session import SyncSessionLocal
 
+
 celery = Celery("secureblogs")
 celery.conf.broker_url = os.environ.get("CELERY_BROKER_URL")
 

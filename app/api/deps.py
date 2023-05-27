@@ -8,6 +8,7 @@ from app.crud.crud_user import get_user_by_token
 from app.db.base import User
 from app.db.session import SessionLocal
 
+
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 
