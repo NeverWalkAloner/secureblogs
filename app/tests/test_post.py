@@ -1,3 +1,5 @@
+from unittest import mock
+
 import pytest
 from sqlalchemy import func, select
 
@@ -60,8 +62,9 @@ async def test_post_details_success(async_client, posts, post_keys, token):
 
 
 @pytest.mark.asyncio
+@mock.patch('app.api.routes.post_routes.ws_manager.send_personal_message')
 async def test_request_post_read_success(
-    async_client, db_session, posts, user, user_key, token
+    mock_websocket, async_client, db_session, posts, user, user_key, token
 ):
     post_db = posts[0]
     response = await async_client.post(
@@ -75,6 +78,14 @@ async def test_request_post_read_success(
         )
     )
     assert users_in_group.scalar_one() == 1
+    mock_websocket.assert_called_once_with(
+        {
+            'post_id': post_db.id,
+            'requested_user_id': user.id,
+            'user_public_key': user_key.public_key,
+        },
+        post_db.user_id,
+    )
 
 
 @pytest.mark.asyncio

@@ -37,10 +37,11 @@ async def websocket_endpoint(
         raise WebSocketException(code=status.HTTP_401_UNAUTHORIZED)
     try:
         await ws_manager.connect(user.id, websocket)
+        await ws_manager.send_personal_message(
+            {"message": "connection accepted"},
+            user.id,
+        )
         while True:
-            data = await websocket.receive_text()
-            await ws_manager.send_personal_message(
-                f"You wrote: {data}, token={token}", user.id
-            )
+            await websocket.receive_text()
     except WebSocketDisconnect:
         ws_manager.disconnect(user.id)

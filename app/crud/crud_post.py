@@ -50,7 +50,9 @@ async def get_posts_count(
     return result.scalar()
 
 
-async def get_post(db: AsyncSession, post_id: int, user: User) -> Post:
+async def get_post_with_keys(
+    db: AsyncSession, post_id: int, user: User
+) -> Post:
     statement = (
         select(Post)
         .join(Post.keys)
@@ -60,6 +62,12 @@ async def get_post(db: AsyncSession, post_id: int, user: User) -> Post:
         .execution_options(populate_existing=True)
         .where(Post.id == post_id)
     )
+    result = await db.execute(statement)
+    return result.scalars().first()
+
+
+async def get_post(db: AsyncSession, post_id: int) -> Post:
+    statement = select(Post).where(Post.id == post_id)
     result = await db.execute(statement)
     return result.scalars().first()
 

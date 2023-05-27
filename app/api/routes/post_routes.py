@@ -3,9 +3,10 @@ from typing import Optional
 from fastapi import APIRouter, HTTPException
 
 from app.api.deps import CurrentUser, DBSession
+from app.api.websockets.managers import ws_manager
 from app.celery_tasks.workers import encrypt_post_content
 from app.core.config import settings
-from app.crud import crud_post
+from app.crud import crud_post, crud_user
 from app.schemas.post import (
     PaginatedPosts,
     PostBase,
@@ -53,7 +54,7 @@ async def get_post(
     db: DBSession,
     current_user: CurrentUser,
 ):
-    post = await crud_post.get_post(db, post_id, current_user)
+    post = await crud_post.get_post_with_keys(db, post_id, current_user)
     if not post:
         raise HTTPException(status_code=404)
     return post
@@ -65,7 +66,19 @@ async def add_read_post_request(
     db: DBSession,
     current_user: CurrentUser,
 ):
+    post = await crud_post.get_post(db, post_id)
+    if not post:
+        raise HTTPException(status_code=404)
+    user_key = await crud_user.get_user_key(db, current_user)
     await crud_post.add_read_post_request(db, current_user, post_id)
+    await ws_manager.send_personal_message(
+        {
+            'post_id': post_id,
+            'requested_user_id': current_user.id,
+            'user_public_key': user_key.public_key,
+        },
+        post.user_id,
+    )
 
 
 @router.post(

@@ -60,3 +60,14 @@ async def update_user_key(
     await db.commit()
     await db.refresh(db_key)
     return db_key
+
+
+async def get_user_key(
+    db: AsyncSession,
+    user: User,
+) -> UserKeys:
+    statement = select(UserKeys).where(
+        (UserKeys.user == user) & (UserKeys.is_revoked == False)
+    )
+    result = await db.execute(statement)
+    return result.scalars().first()
