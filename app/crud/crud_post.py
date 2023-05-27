@@ -57,7 +57,7 @@ async def get_post_with_keys(
         select(Post)
         .join(Post.keys)
         .join(PostKeys.public_key)
-        .filter((UserKeys.is_revoked == False) & (UserKeys.user_id == user.id))
+        .filter(UserKeys.user_id == user.id)
         .options(contains_eager(Post.keys).contains_eager(PostKeys.public_key))
         .execution_options(populate_existing=True)
         .where(Post.id == post_id)

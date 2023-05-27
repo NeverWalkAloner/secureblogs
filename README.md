@@ -9,22 +9,29 @@ If you are interesting in old styled SQLAlchemy async example you can check [thi
 ## Build
 Run
 ```
-$ docker compose up --build
+docker compose up --build
 ```
 
 ## Tests
 Tu run tests use
 ```
-$ docker compose exec web pytest
+docker compose exec web pytest
+```
+
+## Dependencies
+
+To install dependencies use poetry:
+```
+poetry install
 ```
 
 ## Documentation
 To open API documentation go here: http://127.0.0.1:8000/docs
 
 ## Websockets
-If you want to test websocket, you can run simple and websocket client:
+If you want to test websocket, you can run simple websocket client:
 ```
-python websocket_test_client/main.py <USER_TOKEN>
+$ python websocket_test_client/main.py <USER_TOKEN>
 ```
 Please note that you need user token for this. You can create user like this:
 ```
@@ -35,3 +42,11 @@ curl --location 'http://0.0.0.0:8000/sign-up/' \
     "password": "12345678",
     "name": "Sam Vimes"
 }'
+```
+
+## Keypair generation
+
+To generate keypair use following command:
+```
+python console/generate_keys.py
+```

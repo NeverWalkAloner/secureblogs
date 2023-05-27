@@ -20,10 +20,6 @@ async def listen(token: str):
         while True:
             message = await websocket.recv()
             print(f"Received: {message}")
-            await asyncio.sleep(1)
-            await websocket.send("Hello world!")
-            message = await websocket.recv()
-            print(f"Received: {message}")
 
 
 if __name__ == '__main__':
