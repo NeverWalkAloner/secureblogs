@@ -7,8 +7,8 @@ from app.models.users import UserKeys, UserToken
 @pytest.mark.asyncio
 async def test_sign_up(async_client, db_session):
     request_data = {
-        "email": "hello@world.com",
-        "name": "Alex",
+        "email": "sam_vimes@citywatch.com",
+        "name": "Sam Vimes",
         "password": "12345678",
     }
     response = await async_client.post("/sign-up/", json=request_data)
@@ -16,8 +16,8 @@ async def test_sign_up(async_client, db_session):
     assert token_counts.scalar_one() == 1
     assert response.status_code == 200
     assert response.json()["id"] is not None
-    assert response.json()["email"] == "hello@world.com"
-    assert response.json()["name"] == "Alex"
+    assert response.json()["email"] == "sam_vimes@citywatch.com"
+    assert response.json()["name"] == "Sam Vimes"
     assert response.json()["token"]["access_token"] is not None
     assert response.json()["token"]["expires"] is not None
     assert response.json()["token"]["token_type"] == "bearer"
@@ -27,7 +27,7 @@ async def test_sign_up(async_client, db_session):
 async def test_sign_up_existing_user(async_client, user):
     request_data = {
         "email": user.email,
-        "name": "Alex",
+        "name": "Esme Weatherwax",
         "password": "12345678",
     }
     response = await async_client.post("/sign-up/", json=request_data)
@@ -38,8 +38,8 @@ async def test_sign_up_existing_user(async_client, user):
 @pytest.mark.asyncio
 async def test_sign_up_weak_password(async_client):
     request_data = {
-        "email": "hello@world.com",
-        "name": "Alex",
+        "email": "sam_vimes@citywatch.com",
+        "name": "Sam Vimes",
         "password": "123",
     }
     response = await async_client.post("/sign-up/", json=request_data)

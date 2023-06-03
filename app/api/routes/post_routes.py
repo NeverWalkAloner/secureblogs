@@ -71,15 +71,17 @@ async def add_read_post_request(
     if not post:
         raise HTTPException(status_code=404)
     user_key = await crud_user.get_user_key(db, current_user)
-    await crud_post.add_read_post_request(db, current_user, post_id)
-    await ws_manager.send_personal_message(
-        {
-            'post_id': post_id,
-            'requested_user_id': current_user.id,
-            'user_public_key': user_key.public_key,
-        },
-        post.user_id,
-    )
+    request = await crud_post.add_read_post_request(db, current_user, post_id)
+    if request:
+        await ws_manager.send_personal_message(
+            {
+                'request_id': request.id,
+                'post_id': post_id,
+                'requested_user_id': current_user.id,
+                'user_public_key': user_key.public_key,
+            },
+            post.user_id,
+        )
 
 
 @router.post(

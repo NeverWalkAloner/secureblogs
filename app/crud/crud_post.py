@@ -74,7 +74,7 @@ async def get_post(db: AsyncSession, post_id: int) -> Post:
 
 async def add_read_post_request(
     db: AsyncSession, user: User, post_id: int
-) -> None:
+) -> ReadPostRequest:
     exists_statement = select(ReadPostRequest.id).where(
         (ReadPostRequest.user_id == user.id)
         & (ReadPostRequest.post_id == post_id)
@@ -95,6 +95,8 @@ async def add_read_post_request(
     )
     db.add(db_read_post_request)
     await db.commit()
+    await db.refresh(db_read_post_request)
+    return db_read_post_request
 
 
 async def delete_read_post_request(

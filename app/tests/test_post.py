@@ -72,14 +72,16 @@ async def test_request_post_read_success(
         headers={"Authorization": f"Bearer {token.token}"},
     )
     assert response.status_code == 204
-    users_in_group = await db_session.execute(
-        select(func.count(ReadPostRequest.id)).where(
+    request = await db_session.execute(
+        select(ReadPostRequest.id).where(
             ReadPostRequest.user_id == user.id
         )
     )
-    assert users_in_group.scalar_one() == 1
+    request_id = request.scalar_one()
+    assert request_id is not None
     mock_websocket.assert_called_once_with(
         {
+            'request_id': request_id,
             'post_id': post_db.id,
             'requested_user_id': user.id,
             'user_public_key': user_key.public_key,

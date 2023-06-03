@@ -1,10 +1,12 @@
 # FastAPI with async SQLAlchemy, alembic, celery and websockets
 Starting from version 1.4 [SQLAlchemy supports asyncio](https://docs.sqlalchemy.org/en/14/orm/extensions/asyncio.html).
-This means you don't need externla tools like [encode/databases](https://github.com/encode/databases).
+This means you don't need external tools like [encode/databases](https://github.com/encode/databases).
 This educational project demonstrates how you can use new [SQLAlchemy 2.0-style](https://docs.sqlalchemy.org/en/14/glossary.html#term-1) with FastAPI.
 Websockets, celery and alembic for DB migrations are used as well.
 
-If you are interesting in old styled SQLAlchemy async example you can check [this repo](https://github.com/NeverWalkAloner/async-blogs).
+If you are interested in old styled SQLAlchemy async example you can check [this repo](https://github.com/NeverWalkAloner/async-blogs).
+
+Please note that this is educational project only and encryption method using here is not secure.  
 
 ## Build
 Run

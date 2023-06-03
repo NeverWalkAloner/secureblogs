@@ -95,7 +95,7 @@ async def async_client(override_get_db):
 
 @pytest_asyncio.fixture
 async def user(db_session: AsyncSession) -> User:
-    user = UserCreate(email="test@test.com", name="Hello", password="12345678")
+    user = UserCreate(email="nanny_ogg@lancre.com", name="Gytha Ogg", password="12345678")
     user_db = await create_user(db_session, user)
     yield user_db
     await db_session.delete(user_db)
