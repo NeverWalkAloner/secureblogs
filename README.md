@@ -40,7 +40,7 @@ Please note that you need user token for this. You can create user like this:
 curl --location 'http://0.0.0.0:8000/sign-up/' \
 --header 'Content-Type: application/json' \
 --data-raw '{
-    "email": "hello@world.com",
+    "email": "sam_vimes@citywatch.com",
     "password": "12345678",
     "name": "Sam Vimes"
 }'
