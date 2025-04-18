@@ -28,7 +28,8 @@ poetry install
 ```
 
 ## Documentation
-To open API documentation go here: http://127.0.0.1:8000/docs
+To open API documentation go here: http://127.0.0.1:8000/docs.
+Use token returned by `/sign-up/` endpoint to authenticate: `Bearer <token>`.
 
 ## Websockets
 If you want to test websocket, you can run simple websocket client:
